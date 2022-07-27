@@ -1,0 +1,24 @@
+; Rendered by TWIG and consul data
+; APP_NAME: {{ app_name }}
+; STAGE: {{ stage }}
+[{{ app_name }}]
+listen = /tmp/php{{ php_version }}-fpm.{{ app_name }}.socket
+listen.backlog = -1
+listen.allowed_clients = 127.0.0.1
+listen.owner = www-data
+listen.group = www-data
+
+user = {{ unix_user }}
+group = {{ unix_user }}
+
+pm = ondemand
+pm.max_children = 250
+pm.max_requests = 10000
+
+pm.status_path = /fpm_status
+
+php_admin_value[error_log] = {{ project_dir }}/var/log/php-fpm.log
+php_admin_flag[log_errors] = on
+php_value[newrelic.appname] = '{{ app_name }}'
+php_value[newrelic.capture_params] = true
+php_value[opcache.preload] = {{ project_dir }}/config/preload.php

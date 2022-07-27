@@ -1,0 +1,14 @@
+#!/bin/bash
+# This file serves as a central point for specifying your PHP version. This way, you don't have to update php versions all over the place
+# You don't need to reference to this file explicitly: In Vagrant, running `php` will implicitly use this file
+# Similarly, using `@php` or `@composer` in your composer.json will implicitly use these version.
+# Hence, you rarely need to refer to this file explicitly
+set -eu
+
+DEFAULT_PHP_BIN="/usr/bin/php8.0"
+
+# handle PHP_BIN
+: "${PHP_BIN:=$DEFAULT_PHP_BIN}"
+
+# call it
+exec "${PHP_BIN}" "$@"

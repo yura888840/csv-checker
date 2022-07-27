@@ -1,0 +1,7 @@
+#!/bin/bash
+# This file serves as a hook point for customizing your yarn/node version. If it exists, it's used by CI/CD and Vagrant
+# Feel free to remove it if you don't use yarn
+
+# Feel free to uncomment line below if you have some specific node version requirements. Otherwise, default node version will be used (usually LTS)
+# . $(dirname "${BASH_SOURCE-$0}")/nvm.sh
+yarn "$@"

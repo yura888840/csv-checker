@@ -1,0 +1,58 @@
+#####################################################################
+### Include default config from shared project
+include:
+  - project: 'check24-shopping/infra-devel/ci-cd-templates'
+    file: '.gitlab-ci-s2-default.yml'
+  - project: 'check24-shopping/infra-devel/ci-cd-templates'
+    file: '.gitlab-ci-image-php7.4-node12.yml'
+  #####################################################################
+  ### OPTIONAL: if default pipeline triggers are not good enough, try one of these
+  # (see also: https://docs.gitlab.com/ee/ci/yaml/README.html#workflowrules-templates)
+  - project: 'check24-shopping/infra-devel/ci-cd-templates'
+    file: '.gitlab-ci-mergerequest-pipeline.yml'
+    #file: '.gitlab-ci-branch-pipeline.yml'
+
+
+#####################################################################
+### OPTIONAL: Print some debugging output to console
+debugging:
+  stage: build
+  script:
+    - git rev-parse --is-shallow-repository
+    - env
+  allow_failure: true
+
+
+#####################################################################
+### OPTIONAL: Overwrite test job (e.g. to add explizit test call)
+test:
+  script:
+    - composer test
+  artifacts:
+    reports:
+      junit: reports/junit.xml
+    paths:
+      - reports
+
+
+#####################################################################
+### OPTIONAL: Define/Overwrite some deployment jobs, see also
+### https://gitlab.com/check24-shopping/infra-devel/ci-cd-templates/-/blob/master/.gitlab-ci-s2-default.yml
+
+## OPTIONAL: Enable frontend autodeployment (branch: master)
+s2-fe-production:
+  extends:
+    - .s2-fe-production
+    - .auto_deploy_master
+
+## OPTIONAL: Enable worker autodeployment (branch: master)
+s2-wrk-production:
+  extends:
+    - .s2-wrk-production
+    - .auto_deploy_master
+
+## OPTIONAL: Overwrite default job to enable master branch autodeploy for team checkout
+s2-testing-checkout:
+  extends:
+    - .s2-testing-checkout
+    - .auto_deploy_master

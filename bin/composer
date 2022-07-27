@@ -1,0 +1,14 @@
+#!/bin/bash
+# This file serves as a hook point for customizing your composer version. If it exists, it's used by CI/CD and Vagrant
+# In most of the cases you don't need to reference this file explicitly: In Vagrant, running `composer` from within the project directory will implicitly use this file
+# Similarly, using `@composer` in your composer.json will implicitly use this file.
+set -eu
+
+# If you want to ensure that the project is always built with same version of composer as you use locally, add the corresponding composer.phar (from e.g. https://getcomposer.org/composer-2.phar) and put it into bin/ directory.
+# This ensures that the DEV box and CI/CD will use the same version of composer and you get a more reproducible and similar build from DEV to production
+# If bin/composer.phar does not exist, the script will fallback to a system composer version, whatever version this might be.
+if [ -f "$(dirname "${BASH_SOURCE-$0}")/composer.phar" ]; then
+    exec "$(dirname "${BASH_SOURCE-$0}")/php" "$(dirname "${BASH_SOURCE-$0}")/composer.phar" "$@"
+else
+    exec "$(dirname "${BASH_SOURCE-$0}")/php" "$(which composer)" "$@"
+fi

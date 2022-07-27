@@ -1,0 +1,15 @@
+{% extends 'base.html.twig' %}
+
+{% block body_background %}style="background: #b3d7ff"{% endblock %}
+
+{% block body %}
+<h1 style="color: #715792">Upload a new csv file</h1>
+
+{{ form_start(form, { 'attr': {'class': 'row g-3' }, 'row_attr': {'class': 'row g-3' } }) }}
+
+{{ form_row(form.csv_file) }}
+{{ form_row(form.submit, { 'attr': {'class': 'btn btn btn-lg btn-primary' }, 'row_attr': {'class': 'col-auto' } }) }}
+
+{{ form_end(form) }}
+
+{% endblock %}

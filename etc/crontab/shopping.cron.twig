@@ -1,0 +1,13 @@
+# Managed by deployer
+# I'm installed only on shopping-dev box.
+
+# m h dom mon dow command
+
+# run every day at 10:25
+25 10 * * * /usr/bin/php{{ php_version }} {{ project_dir }}/bin/console app:cron:demo-lock >/dev/null
+
+# runs every day between 2:00 and 3:00 o'clock (start time (minute) is randomly generated for each node)
+{{ random(59) }} 2 * * * /usr/bin/php{{ php_version }} {{ project_dir }}/bin/console app:cron:demo-lock >/dev/null
+
+# runs every 15 minutes between 3:00 and 4:00 o'clock (start time (minute) is randomly generated for each node)
+{{ random(14) }}-59/15 3 * * * /usr/bin/php{{ php_version }} {{ project_dir }}/bin/console app:cron:demo-lock >/dev/null

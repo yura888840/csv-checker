@@ -1,0 +1,6 @@
+#!/bin/bash
+# This file serves as a hook point for customizing your node version. If it exists, it's used by CI/CD and Vagrant
+
+# Feel free to uncomment line below if you have some specific node version requirements. Otherwise, default node version will be used (usually LTS)
+#. $(dirname "${BASH_SOURCE-$0}")/nvm.sh
+node "$@"

@@ -1,0 +1,63 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    <h1 style="color: #715792">Result of processing</h1>
+    <p>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="/">Home</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Processing result</li>
+        </ol>
+    </nav>
+    </p>
+    <div class="alert alert-{% if invalidCount > 0 %}danger{% else %}success{% endif %}" role="alert">
+        CSV is {% if invalidCount > 0 %}invalid{% else %}valid{% endif %}
+    </div>
+    <div class="card">
+        <div class="card-header">
+            Checks performed
+        </div>
+        <div class="card-body">
+            <p>
+                <ul>
+                    {% for validation in validations %}
+                    <li>{{ validation }}</li>
+                    {% endfor %}
+                </ul>
+            </p>
+            <p>Invalid rows found : {{ invalidCount }}</p>
+            {% if invalidCount > 0 %}
+            <p>Invalid rows numbers : {{ invalid|join(',') }}</p>
+            {% endif %}
+        </div>
+    </div>
+<p>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="/">Home</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Processing result</li>
+        </ol>
+    </nav>
+</p>
+    <h4 style="color: #715792">Content</h4>
+    <table class="table">
+        <thead>
+        <tr>
+            <th scope="col">#</th>
+            {% for header_column in headers %}
+            <th scope="col">{{ header_column }}</th>
+            {% endfor %}
+        </tr>
+        </thead>
+        <tbody>
+        {% for row in rows %}
+        <tr {% if loop.index in invalid %} class="table-danger"{% endif %}>
+            <th scope="row">{{ loop.index }}</th>
+            {% for column in row %}
+            <td>{{ column }}</td>
+            {% endfor %}
+        </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}

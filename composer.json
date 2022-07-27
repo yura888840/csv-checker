@@ -1,0 +1,272 @@
+{
+    "type": "project",
+    "license": "proprietary",
+    "require": {
+        "php": ">=7.4",
+        "ext-ctype": "*",
+        "ext-curl": "*",
+        "ext-iconv": "*",
+        "ext-json": "*",
+        "ext-sockets": "*",
+        "ext-zend-opcache": "*",
+        "composer/package-versions-deprecated": "1.11.99.2",
+        "deployer/deployer": "^7.0@beta",
+        "doctrine/annotations": "^1.0",
+        "doctrine/doctrine-bundle": "^2.4",
+        "doctrine/doctrine-migrations-bundle": "^3.1",
+        "doctrine/orm": "^2.9",
+        "ekino/newrelic-bundle": "^2.2",
+        "league/pipeline": "^1.0",
+        "liip/monitor-bundle": "^2.15",
+        "nelmio/api-doc-bundle": "^3.0",
+        "newrelic/monolog-enricher": "^1.0",
+        "phpdocumentor/reflection-docblock": "^5.2",
+        "predis/predis": "^1.1",
+        "sensio/framework-extra-bundle": "^6.1",
+        "shopping/deployer-recipes": "^3.0@beta",
+        "snc/redis-bundle": "^3.2",
+        "symfony/asset": "5.3.*",
+        "symfony/console": "5.3.*",
+        "symfony/dotenv": "5.3.*",
+        "symfony/expression-language": "5.3.*",
+        "symfony/flex": "^1.3.1",
+        "symfony/form": "5.3.*",
+        "symfony/framework-bundle": "5.3.*",
+        "symfony/http-client": "5.3.*",
+        "symfony/intl": "5.3.*",
+        "symfony/lock": "^5.3",
+        "symfony/mailer": "5.3.*",
+        "symfony/mime": "5.3.*",
+        "symfony/monolog-bundle": "^3.1",
+        "symfony/notifier": "5.3.*",
+        "symfony/orm-pack": "*",
+        "symfony/process": "5.3.*",
+        "symfony/property-access": "5.3.*",
+        "symfony/property-info": "5.3.*",
+        "symfony/proxy-manager-bridge": "5.3.*",
+        "symfony/runtime": "5.3.*",
+        "symfony/security-bundle": "5.3.*",
+        "symfony/serializer": "5.3.*",
+        "symfony/serializer-pack": "*",
+        "symfony/string": "5.3.*",
+        "symfony/swiftmailer-bundle": "^3.1",
+        "symfony/translation": "5.3.*",
+        "symfony/twig-bundle": "^5.3",
+        "symfony/twig-pack": "^1.0",
+        "symfony/uid": "5.3.*",
+        "symfony/validator": "5.3.*",
+        "symfony/web-link": "5.3.*",
+        "symfony/webpack-encore-bundle": "^1.7",
+        "symfony/yaml": "5.3.*",
+        "ext-http": "*"
+    },
+    "require-dev": {
+        "roave/security-advisories": "dev-latest",
+        "doctrine/doctrine-fixtures-bundle": "^3.3",
+        "shopping/coding-standards": "^2.0",
+        "symfony/debug-pack": "*",
+        "symfony/maker-bundle": "^1.0",
+        "symfony/phpunit-bridge": "^5.0",
+        "symfony/profiler-pack": "*",
+        "symfony/test-pack": "^1.0"
+    },
+    "config": {
+        "preferred-install": {
+            "*": "dist"
+        },
+        "sort-packages": true,
+        "process-timeout": 900
+    },
+    "autoload": {
+        "psr-4": {
+            "App\\": "src/"
+        },
+        "files": ["vendor/newrelic/monolog-enricher/src/Formatter.php"]
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "App\\Tests\\": "tests/"
+        }
+    },
+    "replace": {
+        "paragonie/random_compat": "2.*",
+        "symfony/polyfill-ctype": "*",
+        "symfony/polyfill-iconv": "*",
+        "symfony/polyfill-php74": "*",
+        "symfony/polyfill-php73": "*",
+        "symfony/polyfill-php72": "*",
+        "symfony/polyfill-php71": "*",
+        "symfony/polyfill-php70": "*",
+        "symfony/polyfill-php56": "*"
+    },
+    "scripts": {
+        "pre-operations-exec": [
+            "@test:security"
+        ],
+        "post-install-cmd": [
+            "@composer-scripts"
+        ],
+        "post-update-cmd": [
+            "@composer-scripts"
+        ],
+        "composer-scripts": [
+            "@cache:clear",
+            "@assets:install"
+        ],
+        "cache:clear": [
+            "@php bin/console cache:clear --env=dev --ansi",
+            "@php bin/console cache:clear --env=prod --ansi"
+        ],
+        "assets:install": "@php bin/console assets:install",
+
+
+        "build": [
+            "@build:clean",
+            "@build:prepare",
+            "@frontend:build",
+            "@build:deployer-build"
+        ],
+        "build:latest": [
+            "echo latest"
+        ],
+        "build:lowest": [
+            "echo lowest"
+        ],
+        "build:clean": [
+            "test -e var/cache && mv var/cache var/cache_old; rm -rf var/cache_old",
+            "rm -rf vendor/ public/bundles .env.local.php",
+            "@frontend:clean"
+        ],
+        "frontend:clean": [
+            "rm -rf bin/.nvm",
+            "rm -rf node_modules",
+            "rm -rf public/build"
+        ],
+        "build:prepare": "@composer install --no-interaction",
+        "frontend:build": [
+            "bin/yarn",
+            "bin/yarn run encore production",
+            "rm -rf node_modules"
+        ],
+        "build:deployer-build": "@php vendor/bin/dep build",
+        "lint" : [
+            "@scs:cs"
+        ],
+        "scs:cs": [
+            "@php vendor/bin/php-cs-fixer fix --config=vendor/shopping/coding-standards/php_cs.php --diff -v --using-cache=no --dry-run --allow-risky=yes",
+            "@php vendor/bin/phpstan analyse --level=5 src/"
+        ],
+        "scs:fix": "@php vendor/bin/php-cs-fixer fix --config=vendor/shopping/coding-standards/php_cs.php -v --using-cache=no --allow-risky=yes",
+
+
+        "test" : [
+            "@test:prepare",
+            "@test:unit",
+            "@test:integration",
+            "@test:merge-phpunit-xml",
+            "@test:sonar:report_only",
+            "@test:security"
+        ],
+        "test:prepare": [
+            "mkdir -p reports",
+            "rm -f reports/*"
+        ],
+        "test:unit": [
+            "@php -dxdebug.mode=coverage bin/phpunit --testsuite test --log-junit reports/junit.test.xml --coverage-clover reports/coverage.test.xml --coverage-text --colors=never $(test -z \"$TEAMCITY_PROJECT_NAME\" || echo '--teamcity')"
+        ],
+        "test:integration" : [
+            "@test:integration:run-tests"
+        ],
+        "test:integration:create-schema" : [
+            "@php bin/console --env=test doctrine:database:drop --if-exists --force",
+            "@php bin/console --env=test doctrine:database:create",
+            "@php bin/console --env=test doctrine:migrations:migrate -n"
+        ],
+        "test:integration:test-schema" : [
+            "@php bin/console --env=test doctrine:schema:update --dump-sql"
+        ],
+        "test:integration:load-fixtures" : [
+            "@php bin/console --env=test doctrine:fixtures:load -n"
+        ],
+        "test:integration:run-tests" : [
+            "@php -dxdebug.mode=coverage bin/phpunit --testsuite integration --log-junit reports/junit.integration.xml --coverage-clover reports/coverage.integration.xml --coverage-text --colors=never $(test -z \"$TEAMCITY_PROJECT_NAME\" || echo '--teamcity')"
+        ],
+        "test:merge-phpunit-xml": "/usr/local/bin/merge-phpunit-xml --names='junit.*.xml' reports/ reports/junit.xml || [ ! -x /usr/local/bin/merge-phpunit-xml ]",
+        "test:sonar:report_only": "which sonar-scanner && sonar-scanner || true",
+        "test:sonar": "sonar-scanner -Dsonar.qualitygate.wait=true -Dsonar.qualitygate.timeout=600",
+        "test:security:report_only": "command -v local-php-security-checker && local-php-security-checker || true",
+        "test:security": "local-php-security-checker",
+
+
+        "deploy": "@php vendor/bin/dep -v deploy",
+        "deploy:test": [
+            "@deploy:test:health",
+            "@deploy:test:request"
+        ],
+        "deploy:test:health": [
+            "@php bin/console monitor:health"
+        ],
+        "deploy:test:request": [
+            "curl -s http://deployer-example.shopping.test | jq ."
+        ],
+
+
+        "provision": [
+            "echo 'This _provision_ script will be called while provisioning DEV box (after build, deploy, db create/migration)'"
+        ],
+
+
+        "dev:update-shopping": [
+            "@composer update 'shopping/*'"
+        ],
+        "dev:update-composer": [
+            "wget -O bin/composer.phar https://getcomposer.org/composer-2.phar"
+        ],
+        "dev:setup": [
+            "echo maybe use 'composer require --dev captainhook/plugin-composer' instead",
+            "@php vendor/bin/captainhook install"
+        ],
+        "dev:db-drop" : [
+            "@php bin/console doctrine:database:drop --if-exists --force"
+        ],
+        "dev:db-migrate" : [
+            "@dev:db-drop",
+            "@php bin/console doctrine:database:create",
+            "@php bin/console doctrine:migrations:migrate -n"
+        ],
+        "dev:db-init" : [
+            "@dev:db-migrate",
+            "@php bin/console doctrine:fixtures:load -n"
+        ],
+        "auto-scripts": {
+            "cache:clear": "symfony-cmd",
+            "assets:install %PUBLIC_DIR%": "symfony-cmd"
+        }
+    },
+    "scripts-descriptions": {
+        "build": "Called by CICD to build software and create the files needed for deployment (excluding configs).",
+        "lint": "Called inside DEV box from within captainhook to e.g. check your code style of your software.",
+        "test": "Optionally called by CICD to test your already built software.",
+        "deploy": "Convenience helper for developers to run deployment inside DEV box (creates config files).",
+        "provision": "Called by shopping-dev vagrant box to do DEV box specific stuff while provisioning (e.g. create DEV users)."
+    },
+    "conflict": {
+        "symfony/symfony": "*"
+    },
+    "extra": {
+        "symfony": {
+            "allow-contrib": "true"
+        }
+    },
+    "repositories": [
+        {
+            "type": "vcs",
+            "url": "ssh://git@bitbucket.check24.de:7999/shops2/coding-standards.git"
+        },
+        {
+            "type": "composer",
+            "url": "https://satis.ch24.de"
+        }
+    ]
+
+}
